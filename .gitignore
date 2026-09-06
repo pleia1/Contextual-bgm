@@ -1,4 +1,5 @@
 helper/config.local.json
 helper/data/
+risu-plugin/local/
 node_modules/
 npm-debug.log*

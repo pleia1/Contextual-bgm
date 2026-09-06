@@ -1,7 +1,9 @@
 //@name contextual_youtube_bgm
 //@api 3.0
-//@version 0.4.1
-//@display-name Contextual YouTube BGM v0.4.1
+//@version 0.4.2
+//@update-url https://raw.githubusercontent.com/pleia1/Contextual-bgm/main/risu-plugin/contextual-youtube-bgm.plugin.js
+//@display-name Contextual YouTube BGM v0.4.2
+//@link https://github.com/pleia1/Contextual-bgm Source and releases
 //@arg helper_url string Local helper URL (default: http://127.0.0.1:43127)
 //@arg helper_token string Token printed by the local helper
 //@arg context_messages int Recent messages sent to the auxiliary model (3-12, default: 6)
@@ -86,7 +88,7 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
       .error { color: #ff7b72; white-space: pre-wrap; margin-top: 12px; font-size: 13px; }
     </style>
     <main>
-      <header><h1>Contextual YouTube BGM v0.4.1</h1><button id="close">닫기</button></header>
+      <header><h1>Contextual YouTube BGM v0.4.2</h1><button id="close">닫기</button></header>
       <section class="status">
         <div id="phase" class="phase">초기화 중</div>
         <div id="summary" class="muted"></div>
@@ -1013,7 +1015,7 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
   }
 
   const chatButton = await Risuai.registerButton(
-    { name: 'Contextual BGM v0.4.1', icon: '♫', iconType: 'html', location: 'chat' },
+    { name: 'Contextual BGM v0.4.2', icon: '♫', iconType: 'html', location: 'chat' },
     openPanel,
   );
   const settingButton = await Risuai.registerSetting('Contextual YouTube BGM', openPanel, '♫', 'html');

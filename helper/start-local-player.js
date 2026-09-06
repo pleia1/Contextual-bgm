@@ -12,8 +12,10 @@ const HELPER_DIR = dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = dirname(HELPER_DIR);
 const CONFIG_PATH = join(HELPER_DIR, 'config.local.json');
 const SERVER_PATH = join(HELPER_DIR, 'server.js');
-const PLUGIN_FILENAME = 'contextual-youtube-bgm-v0.4.1.plugin.js';
-const PLUGIN_PATH = join(PROJECT_DIR, 'risu-plugin', PLUGIN_FILENAME);
+const PLUGIN_SOURCE_FILENAME = 'contextual-youtube-bgm-v0.4.2.plugin.js';
+const PLUGIN_INSTALL_FILENAME = 'contextual-youtube-bgm-v0.4.2.local.plugin.js';
+const PLUGIN_SOURCE_PATH = join(PROJECT_DIR, 'risu-plugin', PLUGIN_SOURCE_FILENAME);
+const PLUGIN_INSTALL_PATH = join(PROJECT_DIR, 'risu-plugin', 'local', PLUGIN_INSTALL_FILENAME);
 const STARTUP_TIMEOUT_MS = 20_000;
 const DEFAULT_BROWSER_WINDOW = { width: 980, height: 824 };
 
@@ -71,17 +73,15 @@ async function saveConfig(config) {
 }
 
 async function syncPluginToken(authToken) {
-  if (!existsSync(PLUGIN_PATH)) {
-    throw new Error(`Cannot find risu-plugin/${PLUGIN_FILENAME}.`);
+  if (!existsSync(PLUGIN_SOURCE_PATH)) {
+    throw new Error(`Cannot find risu-plugin/${PLUGIN_SOURCE_FILENAME}.`);
   }
-  const source = await readFile(PLUGIN_PATH, 'utf8');
+  const source = await readFile(PLUGIN_SOURCE_PATH, 'utf8');
   const updated = injectHelperToken(source, authToken);
-  if (updated === source) return;
-  const temporaryPath = `${PLUGIN_PATH}.tmp`;
-  await writeFile(temporaryPath, updated, 'utf8');
-  await rename(temporaryPath, PLUGIN_PATH);
-  console.log('Inserted the local helper token into the RisuAI plugin file.');
-  console.log(`Import or hot-reload risu-plugin/${PLUGIN_FILENAME} in RisuAI.`);
+  await mkdir(dirname(PLUGIN_INSTALL_PATH), { recursive: true });
+  await writeFile(PLUGIN_INSTALL_PATH, updated, 'utf8');
+  console.log('Created a Git-ignored RisuAI plugin copy with the local helper token.');
+  console.log(`Import or hot-reload risu-plugin/local/${PLUGIN_INSTALL_FILENAME} in RisuAI.`);
 }
 
 async function prepareConfig() {

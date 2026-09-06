@@ -1,10 +1,10 @@
-# Risu Contextual YouTube BGM v0.4.1
+# Risu Contextual YouTube BGM v0.4.2
 
 RisuAI의 최근 대화 맥락을 `otherAx` 보조 모델에 보내 BGM 후보를 만들고, 로컬 플레이어가 YouTube Data API로 검색해 재생하는 프로토타입입니다.
 
 RisuAI API v3 샌드박스는 외부 iframe을 허용하지 않으므로 프로젝트가 두 부분으로 나뉩니다.
 
-- `risu-plugin/contextual-youtube-bgm-v0.4.1.plugin.js`: 응답 완료 감지, 대화 맥락 정리, 보조 모델 선곡
+- `risu-plugin/contextual-youtube-bgm-v0.4.2.plugin.js`: 응답 완료 감지, 대화 맥락 정리, 보조 모델 선곡
 - `helper/`: YouTube 검색·재생, 상태 관리, 반복 방지 이력 저장
 
 YouTube 음원을 추출하거나 다운로드하지 않습니다. 공식 Data API 검색 결과와 공식 IFrame Player를 사용합니다.
@@ -18,7 +18,7 @@ YouTube 음원을 추출하거나 다운로드하지 않습니다. 공식 Data A
 
 ## 1. 로컬 플레이어 설정
 
-Windows에서는 프로젝트 폴더의 `start-local-player.bat`을 더블클릭하면 도우미 서버가 실행되고, 준비가 끝난 뒤 인증된 플레이어 페이지가 브라우저에서 자동으로 열립니다. `helper/config.local.json`이 없거나 YouTube API 키가 비어 있는 첫 실행에서는 키를 입력받아 설정 파일에 저장합니다. 이어서 자동재생 제한을 해제한 전용 브라우저로 열지 Y/N으로 한 번 물어보고 선택을 저장합니다. 동시에 임의 생성된 helper token을 `risu-plugin/contextual-youtube-bgm-v0.4.1.plugin.js`에 자동 삽입합니다. 이미 도우미가 실행 중이라면 중복 실행하지 않고 플레이어 페이지만 엽니다. BGM을 사용하는 동안 열린 터미널 창은 닫지 마세요.
+Windows에서는 프로젝트 폴더의 `start-local-player.bat`을 더블클릭하면 도우미 서버가 실행되고, 준비가 끝난 뒤 인증된 플레이어 페이지가 브라우저에서 자동으로 열립니다. `helper/config.local.json`이 없거나 YouTube API 키가 비어 있는 첫 실행에서는 키를 입력받아 설정 파일에 저장합니다. 이어서 자동재생 제한을 해제한 전용 브라우저로 열지 Y/N으로 한 번 물어보고 선택을 저장합니다. 동시에 임의 생성된 helper token이 들어간 로컬 설치본 `risu-plugin/local/contextual-youtube-bgm-v0.4.2.local.plugin.js`를 생성합니다. 이 폴더는 Git에서 제외되므로 토큰이 public 저장소에 커밋되지 않습니다. 이미 도우미가 실행 중이라면 중복 실행하지 않고 플레이어 페이지만 엽니다. BGM을 사용하는 동안 열린 터미널 창은 닫지 마세요.
 
 - `Y`: Edge 또는 Chrome을 별도 전용 프로필과 `--autoplay-policy=no-user-gesture-required` 옵션으로 실행합니다. 플레이어 카드에 맞춘 약 980×824px 크기의 앱 창으로 열리며, 이 옵션은 해당 전용 프로필에만 사용됩니다.
 - `N`: 시스템 기본 브라우저로 엽니다. 브라우저 정책에 따라 첫 곡에서 `소리 재생 허용` 클릭이 필요할 수 있습니다.
@@ -31,7 +31,7 @@ Windows에서는 프로젝트 폴더의 `start-local-player.bat`을 더블클릭
 npm run player
 ```
 
-최초 실행 시 `helper/config.local.json`이 자동 생성됩니다. 배포 ZIP에는 API 키와 인증 토큰 보호를 위해 이 로컬 설정 파일을 포함하지 않습니다. BAT 실행 후의 플러그인 JS에는 로컬 helper token이 들어가므로 그 파일도 다른 사람에게 그대로 공유하지 마세요.
+최초 실행 시 `helper/config.local.json`이 자동 생성됩니다. 배포 ZIP에는 API 키와 인증 토큰 보호를 위해 이 로컬 설정 파일을 포함하지 않습니다. BAT이 `risu-plugin/local/`에 만든 플러그인 JS에는 로컬 helper token이 들어가므로 그 파일도 다른 사람에게 그대로 공유하지 마세요.
 
 `helper/config.local.json`의 `youtubeApiKey`에 API 키를 입력하거나 환경 변수로 전달합니다.
 
@@ -58,7 +58,7 @@ Player URL을 일반 브라우저에서 열어 둡니다. 자동재생이 차단
 
 ## 2. RisuAI 플러그인 설치
 
-먼저 `start-local-player.bat`을 한 번 실행한 다음 RisuAI에서 `risu-plugin/contextual-youtube-bgm-v0.4.1.plugin.js`를 가져옵니다. 개발 중에는 `Import plugin with hot reload`를 권장합니다. BAT을 다시 실행해 토큰이 바뀐 경우 hot reload 또는 플러그인 재가져오기로 반영합니다.
+먼저 `start-local-player.bat`을 한 번 실행한 다음 RisuAI에서 생성된 `risu-plugin/local/contextual-youtube-bgm-v0.4.2.local.plugin.js`를 가져옵니다. 개발 중에는 `Import plugin with hot reload`를 권장합니다. BAT을 다시 실행해 토큰이 바뀐 경우 local 설치본이 갱신되고 hot reload가 이를 반영합니다.
 
 플러그인 인자를 다음처럼 설정합니다.
 
@@ -111,11 +111,13 @@ RisuAI는 플러그인의 `//@version`과 `//@update-url` 메타데이터를 이
 ```javascript
 //@name contextual_youtube_bgm
 //@api 3.0
-//@version 0.4.1
-//@update-url https://raw.githubusercontent.com/USER/REPOSITORY/main/contextual-youtube-bgm.plugin.js
+//@version 0.4.2
+//@update-url https://raw.githubusercontent.com/pleia1/Contextual-bgm/main/risu-plugin/contextual-youtube-bgm.plugin.js
 ```
 
-현재 저장소가 private인 동안에는 `raw.githubusercontent.com` 파일도 인증 없이 읽을 수 없으므로 `@update-url`로 사용할 수 없습니다. RisuAI의 업데이트 메타데이터에는 GitHub 인증 헤더를 지정하는 항목이 없으며, 토큰을 URL이나 플러그인 코드에 넣으면 유출되므로 사용하지 마세요. 자동 업데이트를 사용하려면 이 저장소를 public으로 전환하거나, 버전이 붙지 않는 최신 플러그인 JS 하나만 별도의 public 저장소·정적 호스팅에 배포해야 합니다. v0.4.0부터는 BAT이 JS에 삽입한 helper token을 RisuAI의 기기 로컬 플러그인 저장소에도 복사하므로, 원격 업데이트가 플러그인 코드를 교체해도 같은 `@name`을 유지하는 한 로컬 도우미 연결값을 이어받습니다. 공식 규격은 [RisuAI Plugin Development Guide](https://github.com/kwaroran/RisuAI/blob/main/plugins.md)의 `@update-url`과 `@version` 항목을 참고하세요.
+public 저장소의 고정 배포 파일 `risu-plugin/contextual-youtube-bgm.plugin.js`가 업데이트 확인 주소입니다. 최초 설치는 BAT이 `risu-plugin/local/`에 생성하는 토큰 포함 설치본으로 진행하고, 저장소의 버전 파일과 고정 배포 파일은 항상 토큰 없는 원본으로 유지합니다. v0.4.0부터 플러그인이 삽입된 helper token을 RisuAI의 기기 로컬 플러그인 저장소에도 복사하므로, 원격 업데이트가 토큰 없는 고정 배포 파일로 코드를 교체해도 같은 `@name`을 유지하는 한 로컬 도우미 연결값을 이어받습니다. 새 버전을 배포할 때는 버전 파일과 고정 배포 파일의 코드 및 `//@version`을 함께 갱신해야 합니다. 공식 규격은 [RisuAI Plugin Development Guide](https://github.com/kwaroran/RisuAI/blob/main/plugins.md)의 `@update-url`과 `@version` 항목을 참고하세요.
+
+RisuAI 자동 업데이트는 플러그인 JS만 교체합니다. `helper/` 코드가 바뀐 릴리스에서는 새 프로젝트 ZIP도 받아 로컬 도우미를 함께 교체해야 합니다.
 
 ## GitHub 버전 관리
 
@@ -124,7 +126,7 @@ RisuAI는 플러그인의 `//@version`과 `//@update-url` 메타데이터를 이
 ```powershell
 git init
 git add .
-git commit -m "Initial release v0.4.1"
+git commit -m "Release v0.4.2"
 git branch -M main
 git remote add origin https://github.com/pleia1/Contextual-bgm.git
 git push -u origin main

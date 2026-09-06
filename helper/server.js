@@ -1076,7 +1076,7 @@ const server = http.createServer(async (request, response) => {
 
 server.listen(config.port, '127.0.0.1', () => {
   const playerUrl = `http://127.0.0.1:${config.port}/player?token=${encodeURIComponent(config.authToken)}`;
-  console.log('Risu Contextual YouTube BGM helper v0.4.1 is running.');
+  console.log('Risu Contextual YouTube BGM helper v0.4.2 is running.');
   console.log(`Player: ${playerUrl}`);
   console.log(`Plugin helper URL: http://127.0.0.1:${config.port}`);
   console.log(`Plugin helper token: ${config.authToken}`);
