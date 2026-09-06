@@ -15,6 +15,7 @@ let currentVideoId = '';
 let currentStatus = {};
 let cueRecoveryTimer = null;
 let crossfadeTimer = null;
+let pendingAudibleStartVideoId = '';
 let lastTelemetryAt = 0;
 let baseVolume = 35;
 let pollInFlight = false;
@@ -134,6 +135,7 @@ function resetStandby({ stop = true } = {}) {
 function resetAllPlayers() {
   cancelCrossfade();
   clearCueRecovery();
+  pendingAudibleStartVideoId = '';
   for (const slot of Object.values(slots)) {
     clearWarmTimer(slot);
     slot.warming = false;
@@ -153,8 +155,9 @@ function recoverCuedPlayback() {
   cueRecoveryTimer = setTimeout(() => {
     const slot = activeSlot();
     if (!slot.ready || slot.player.getPlayerState() !== 5) return;
-    slot.player.unMute();
-    slot.player.setVolume(baseVolume);
+    pendingAudibleStartVideoId = slot.videoId;
+    slot.player.mute();
+    slot.player.setVolume(0);
     slot.player.playVideo();
     cueRecoveryTimer = setTimeout(() => {
       if (slot.ready && slot.player.getPlayerState() === 5) {
@@ -213,6 +216,14 @@ function handlePlayerState(slot, event) {
   }
   if (slot.name !== activeSlotName || slot.videoId !== currentVideoId) return;
   if (crossfadeTimer && event.data === 0) return;
+  if (event.data === 1 && pendingAudibleStartVideoId === slot.videoId) {
+    pendingAudibleStartVideoId = '';
+    try {
+      slot.player.setVolume(baseVolume);
+      slot.player.unMute();
+      slot.player.playVideo();
+    } catch { /* onAutoplayBlocked handles browsers that still require a gesture. */ }
+  }
   if (event.data === 5) recoverCuedPlayback();
   else clearCueRecovery();
   if (name) sendEvent(name, { videoId: slot.videoId, ...(slotTelemetry(slot, name) || {}) });
@@ -245,7 +256,24 @@ function handleAutoplayBlocked(slot) {
     sendEvent('preloadBlocked', { videoId: slot.videoId });
     return;
   }
+  pendingAudibleStartVideoId = '';
   sendEvent('autoplayBlocked', { videoId: slot.videoId || currentVideoId });
+}
+
+function enableIframeAutoplay(slot) {
+  try {
+    const iframe = slot.player.getIframe();
+    const permissions = new Set(
+      String(iframe.getAttribute('allow') || '')
+        .split(';')
+        .map((value) => value.trim())
+        .filter(Boolean),
+    );
+    permissions.add('autoplay');
+    permissions.add('encrypted-media');
+    iframe.setAttribute('allow', [...permissions].join('; '));
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+  } catch { /* The generated iframe may not be available until the next event loop. */ }
 }
 
 window.onYouTubeIframeAPIReady = () => {
@@ -253,10 +281,11 @@ window.onYouTubeIframeAPIReady = () => {
     slot.player = new YT.Player(slot.elementId, {
       width: '100%',
       height: '100%',
-      playerVars: { playsinline: 1, rel: 0, origin: location.origin },
+      playerVars: { autoplay: 1, playsinline: 1, rel: 0, origin: location.origin },
       events: {
         onReady: () => {
           slot.ready = true;
+          enableIframeAutoplay(slot);
           if (!playersReady && Object.values(slots).every((entry) => entry.ready)) {
             playersReady = true;
             sendEvent('ready');
@@ -363,8 +392,9 @@ async function executeCommand(command) {
       currentVideoId = payload.track.videoId;
       slot.videoId = currentVideoId;
       baseVolume = Number(payload.volume ?? 35);
-      slot.player.setVolume(baseVolume);
-      slot.player.unMute();
+      pendingAudibleStartVideoId = currentVideoId;
+      slot.player.mute();
+      slot.player.setVolume(0);
       slot.player.loadVideoById(currentVideoId);
       slot.player.playVideo();
       break;
@@ -426,6 +456,7 @@ async function poll() {
 document.querySelector('#enable').addEventListener('click', () => {
   const slot = activeSlot();
   if (!slot.ready) return;
+  pendingAudibleStartVideoId = '';
   slot.player.unMute();
   slot.player.setVolume(baseVolume);
   slot.player.playVideo();

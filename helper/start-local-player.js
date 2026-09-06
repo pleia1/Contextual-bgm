@@ -12,8 +12,8 @@ const HELPER_DIR = dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = dirname(HELPER_DIR);
 const CONFIG_PATH = join(HELPER_DIR, 'config.local.json');
 const SERVER_PATH = join(HELPER_DIR, 'server.js');
-const PLUGIN_SOURCE_FILENAME = 'contextual-youtube-bgm-v0.4.2.plugin.js';
-const PLUGIN_INSTALL_FILENAME = 'contextual-youtube-bgm-v0.4.2.local.plugin.js';
+const PLUGIN_SOURCE_FILENAME = 'contextual-youtube-bgm-v0.4.3.plugin.js';
+const PLUGIN_INSTALL_FILENAME = 'contextual-youtube-bgm-v0.4.3.local.plugin.js';
 const PLUGIN_SOURCE_PATH = join(PROJECT_DIR, 'risu-plugin', PLUGIN_SOURCE_FILENAME);
 const PLUGIN_INSTALL_PATH = join(PROJECT_DIR, 'risu-plugin', 'local', PLUGIN_INSTALL_FILENAME);
 const STARTUP_TIMEOUT_MS = 20_000;
@@ -180,13 +180,15 @@ async function openAutoplayBrowser(url, windowWidth, windowHeight) {
   }
   const localBase = process.env.LOCALAPPDATA || process.env.TEMP;
   if (!localBase) throw new Error('Cannot locate a directory for the dedicated browser profile.');
-  const profileDirectory = join(localBase, 'RisuContextualYouTubeBGM', 'browser-profile');
+  // Avoid reusing an older browser process that may have started without the autoplay flag.
+  const profileDirectory = join(localBase, 'RisuContextualYouTubeBGM', 'browser-profile-autoplay-v1');
   await mkdir(profileDirectory, { recursive: true });
   await new Promise((resolve, reject) => {
     const browser = spawn(executable, [
       '--autoplay-policy=no-user-gesture-required',
       `--user-data-dir=${profileDirectory}`,
       '--no-first-run',
+      '--no-default-browser-check',
       '--disable-default-apps',
       `--window-size=${windowWidth},${windowHeight}`,
       `--app=${url}`,

@@ -1,13 +1,13 @@
 {
   "name": "risu-contextual-youtube-bgm",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": true,
   "type": "module",
   "description": "Context-aware YouTube BGM companion for a RisuAI API v3 plugin",
   "scripts": {
     "start": "node helper/server.js",
     "player": "node helper/start-local-player.js",
-    "check": "node --check helper/server.js && node --check helper/start-local-player.js && node --check helper/static/player.js && node --check helper/src/crossfade.js && node --check helper/src/history.js && node --check helper/src/model-response.js && node --check helper/src/playback-evidence.js && node --check helper/src/plugin-token.js && node --check helper/src/youtube.js && node --check risu-plugin/contextual-youtube-bgm-v0.4.2.plugin.js && node --check risu-plugin/contextual-youtube-bgm.plugin.js",
+    "check": "node --check helper/server.js && node --check helper/start-local-player.js && node --check helper/static/player.js && node --check helper/src/crossfade.js && node --check helper/src/history.js && node --check helper/src/model-response.js && node --check helper/src/playback-evidence.js && node --check helper/src/plugin-token.js && node --check helper/src/youtube.js && node --check risu-plugin/contextual-youtube-bgm-v0.4.3.plugin.js && node --check risu-plugin/contextual-youtube-bgm.plugin.js",
     "test": "node --test helper/test/*.test.js"
   },
   "engines": {

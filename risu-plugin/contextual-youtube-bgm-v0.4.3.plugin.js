@@ -1,8 +1,8 @@
 //@name contextual_youtube_bgm
 //@api 3.0
-//@version 0.4.2
+//@version 0.4.3
 //@update-url https://raw.githubusercontent.com/pleia1/Contextual-bgm/main/risu-plugin/contextual-youtube-bgm.plugin.js
-//@display-name Contextual YouTube BGM v0.4.2
+//@display-name Contextual YouTube BGM v0.4.3
 //@link https://github.com/pleia1/Contextual-bgm Source and releases
 //@arg helper_url string Local helper URL (default: http://127.0.0.1:43127)
 //@arg helper_token string Token printed by the local helper
@@ -56,94 +56,199 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
     <style>
       :root { color-scheme: dark; font-family: Inter, Pretendard, system-ui, sans-serif; }
       * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; background: #0d1117; color: #e6edf3; padding: 24px; }
-      main { width: min(760px, 100%); margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 18px; padding: 22px; }
-      header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-      h1 { margin: 0; font-size: 20px; }
-      h2 { margin: 24px 0 10px; font-size: 14px; color: #8b949e; }
-      button { border: 1px solid #3d444d; background: #21262d; color: #e6edf3; padding: 9px 13px; border-radius: 9px; cursor: pointer; }
-      button:hover { background: #30363d; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px;
+        background: radial-gradient(circle at 50% 0%, #172033 0, #0d1117 38%, #090c11 100%);
+        color: #e6edf3;
+      }
+      main {
+        width: min(820px, 100%);
+        margin: 0 auto;
+        padding: 22px;
+        border: 1px solid #30363d;
+        border-radius: 20px;
+        background: #131820;
+        box-shadow: 0 22px 70px #0008;
+      }
+      header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+      h1 { margin: 3px 0 0; font-size: 20px; letter-spacing: -0.02em; }
+      h2 { margin: 0; font-size: 15px; color: #e6edf3; }
+      button {
+        min-height: 38px;
+        padding: 8px 13px;
+        border: 1px solid #3d4652;
+        border-radius: 9px;
+        background: #202731;
+        color: #e6edf3;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover { background: #2a3441; border-color: #536171; }
+      button.primary { background: #2f81f7; border-color: #438ef4; color: #fff; }
+      button.primary:hover { background: #438ef4; }
+      button.subtle { background: transparent; }
       button.danger { color: #ff7b72; }
-      .status { margin-top: 20px; padding: 14px; background: #0d1117; border-radius: 12px; }
-      .phase { font-size: 18px; font-weight: 700; }
-      .muted { color: #8b949e; font-size: 13px; margin-top: 5px; }
-      .track { margin-top: 12px; font-weight: 650; }
-      .controls { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
-      .field { display: grid; gap: 6px; margin-top: 10px; }
-      label { color: #8b949e; font-size: 12px; }
-      input, textarea { width: 100%; padding: 9px; border: 1px solid #30363d; border-radius: 8px; background: #010409; color: #e6edf3; font: inherit; }
-      textarea { min-height: 150px; resize: vertical; line-height: 1.45; }
-      input[type="checkbox"] { width: auto; accent-color: #2f81f7; }
-      .row { display: flex; align-items: end; gap: 9px; }
-      .row .field { flex: 1; }
-      .inline-check { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #e6edf3; font-size: 13px; }
-      .queue-list { display: grid; gap: 6px; margin-top: 9px; }
-      .queue-item { padding: 8px 10px; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; font-size: 13px; }
-      .feedback { min-height: 18px; color: #8b949e; font-size: 12px; margin-top: 7px; }
-      details { margin-top: 18px; border-top: 1px solid #30363d; padding-top: 14px; }
-      summary { cursor: pointer; color: #8b949e; font-weight: 650; }
-      .history-list { display: grid; gap: 6px; margin-top: 10px; max-height: 280px; overflow: auto; }
-      .history-item { padding: 8px 10px; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; }
+      .eyebrow { color: #6e94c5; font-size: 11px; font-weight: 750; letter-spacing: 0.12em; }
+      .status-card {
+        padding: 16px 17px;
+        border: 1px solid #27313d;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #0d1117, #101722);
+      }
+      .status-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .status-label { color: #6e7681; font-size: 10px; font-weight: 750; letter-spacing: 0.12em; }
+      .phase { padding: 4px 9px; border-radius: 999px; background: #1b2635; color: #9dc4f6; font-size: 12px; font-weight: 700; }
+      .muted { color: #8b949e; font-size: 12px; margin-top: 5px; line-height: 1.45; }
+      .track { margin-top: 13px; font-size: 17px; font-weight: 700; }
+      .transport { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+      .panel-section { margin-top: 12px; padding: 17px; border: 1px solid #29323d; border-radius: 14px; background: #171d25; }
+      .section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+      .section-copy { margin: 5px 0 0; color: #8b949e; font-size: 12px; line-height: 1.45; }
+      .count-pill { min-width: 27px; padding: 4px 8px; border-radius: 999px; background: #242d38; color: #9dc4f6; font-size: 12px; text-align: center; }
+      .field { display: grid; gap: 7px; min-width: 0; }
+      label, .field-label { color: #9da7b3; font-size: 12px; }
+      input, textarea {
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid #343e4a;
+        border-radius: 9px;
+        outline: none;
+        background: #090d12;
+        color: #e6edf3;
+        font: inherit;
+      }
+      input:focus, textarea:focus { border-color: #2f81f7; box-shadow: 0 0 0 3px #2f81f726; }
+      textarea { min-height: 180px; resize: vertical; line-height: 1.5; }
+      .queue-compose { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: end; gap: 9px; }
+      .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .switch-list { display: grid; gap: 1px; margin: 14px 0; overflow: hidden; border: 1px solid #29323d; border-radius: 11px; background: #29323d; }
+      .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 12px; background: #11171e; cursor: pointer; }
+      .switch-copy { display: grid; gap: 3px; color: #e6edf3; font-size: 13px; font-weight: 650; }
+      .switch-copy small { color: #7f8a96; font-size: 11px; font-weight: 400; line-height: 1.35; }
+      .switch-row input { appearance: none; flex: 0 0 auto; width: 38px; height: 22px; padding: 2px; border: 0; border-radius: 999px; background: #3a4552; cursor: pointer; }
+      .switch-row input::after { content: ''; display: block; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 140ms ease; }
+      .switch-row input:checked { background: #2f81f7; }
+      .switch-row input:checked::after { transform: translateX(16px); }
+      .queue-list { display: grid; gap: 6px; margin-top: 11px; }
+      .queue-item { padding: 9px 11px; border: 1px solid #2d3742; border-radius: 9px; background: #0d1218; font-size: 13px; }
+      .section-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+      .feedback { min-height: 18px; color: #8b949e; font-size: 12px; }
+      details summary { list-style: none; cursor: pointer; }
+      details summary::-webkit-details-marker { display: none; }
+      .history-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .history-summary-copy { display: grid; gap: 4px; }
+      .history-summary-copy small { color: #8b949e; font-size: 11px; font-weight: 400; }
+      .chevron { color: #8b949e; transition: transform 140ms ease; }
+      details[open] .chevron { transform: rotate(180deg); }
+      .history-list { display: grid; gap: 6px; margin-top: 14px; max-height: 280px; overflow: auto; }
+      .history-item { padding: 9px 11px; border: 1px solid #2d3742; border-radius: 9px; background: #0d1218; }
       .history-time { color: #6e7681; font-size: 11px; margin-top: 3px; }
-      .error { color: #ff7b72; white-space: pre-wrap; margin-top: 12px; font-size: 13px; }
+      .url-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; }
+      .error { color: #ff7b72; white-space: pre-wrap; margin-top: 10px; font-size: 12px; }
+      @media (max-width: 620px) {
+        body { padding: 10px; }
+        main { padding: 15px; border-radius: 15px; }
+        .queue-compose, .settings-grid, .url-row { grid-template-columns: 1fr; }
+        .queue-compose button, .url-row button { width: 100%; }
+      }
     </style>
     <main>
-      <header><h1>Contextual YouTube BGM v0.4.2</h1><button id="close">닫기</button></header>
-      <section class="status">
-        <div id="phase" class="phase">초기화 중</div>
+      <header>
+        <div><div class="eyebrow">PLAYBACK COMPANION</div><h1>Contextual YouTube BGM v0.4.3</h1></div>
+        <button id="close" class="subtle">닫기</button>
+      </header>
+      <section class="status-card">
+        <div class="status-heading"><span class="status-label">PLAYER STATUS</span><span id="phase" class="phase">초기화 중</span></div>
         <div id="summary" class="muted"></div>
         <div id="track" class="track"></div>
         <div id="artist" class="muted"></div>
         <div id="error" class="error"></div>
       </section>
-      <div class="controls">
-        <button id="refresh">새로고침</button>
-        <button id="play">재생</button>
+      <div class="transport">
+        <button id="play" class="primary">재생</button>
         <button id="pause">일시정지</button>
         <button id="stop">정지</button>
         <button id="skip">다음 후보</button>
-        <button id="clear-history" class="danger">재생 이력 초기화</button>
+        <button id="refresh" class="subtle">새로고침</button>
       </div>
-      <h2>원하는 곡 대기열 <span id="queue-count"></span></h2>
-      <div class="row">
-        <div class="field">
-          <label for="queue-query">곡명 또는 아티스트와 곡명</label>
-          <input id="queue-query" placeholder="예: Khruangbin - August 10" />
+      <section class="panel-section">
+        <div class="section-head">
+          <div><h2>원하는 곡 대기열</h2><p class="section-copy">재생 중이면 현재 곡이 끝난 뒤 순서대로 이어집니다.</p></div>
+          <span id="queue-count" class="count-pill">0</span>
         </div>
-        <button id="add-queue">큐에 추가</button>
-        <button id="clear-queue" class="danger">큐 비우기</button>
-      </div>
-      <div id="queue-list" class="queue-list"></div>
-      <h2>자동 선곡 설정</h2>
-      <div class="row">
-        <div class="field">
-          <label for="context-messages">보조 모델에 전달할 최근 메시지 수 (3–12, 기본 6)</label>
-          <input id="context-messages" type="number" min="3" max="12" step="1" />
+        <div class="queue-compose">
+          <div class="field">
+            <label for="queue-query">곡명 또는 아티스트와 곡명</label>
+            <input id="queue-query" placeholder="예: Khruangbin - August 10" />
+          </div>
+          <button id="add-queue" class="primary">대기열 추가</button>
+          <button id="clear-queue" class="danger">모두 비우기</button>
         </div>
-        <button id="save-settings">설정 저장</button>
-      </div>
-      <label class="inline-check"><input id="auto-enabled" type="checkbox" />새 AI 응답에서 자동 선곡 사용</label>
-      <label class="inline-check"><input id="now-playing-enabled" type="checkbox" />채팅 화면에 Now Playing 플로팅 표시</label>
-      <label class="inline-check"><input id="crossfade-enabled" type="checkbox" />곡이 끝나기 전에 다음 곡을 선곡하고 크로스페이드</label>
-      <div class="field">
-        <label for="crossfade-seconds">크로스페이드 길이 (1–15초, 기본 5초)</label>
-        <input id="crossfade-seconds" type="number" min="1" max="15" step="1" />
-      </div>
-      <div class="field">
-        <label for="selection-prompt">보조 모델 선곡 지침 (응답 JSON 형식과 필수 안전 규칙은 자동으로 뒤에 추가됩니다)</label>
-        <textarea id="selection-prompt"></textarea>
-      </div>
-      <div class="controls"><button id="reset-prompt">기본 선곡 지침 복원</button></div>
-      <div id="settings-feedback" class="feedback"></div>
-      <details id="history-details">
-        <summary>재생 이력 펼치기</summary>
-        <div id="history-list" class="history-list"></div>
-      </details>
-      <h2>로컬 플레이어</h2>
-      <div class="field">
-        <label for="player-url">아래 주소를 일반 브라우저에서 열어 둡니다.</label>
-        <input id="player-url" readonly />
-      </div>
+        <div id="queue-list" class="queue-list"></div>
+      </section>
+      <section class="panel-section">
+        <div class="section-head">
+          <div><h2>자동 선곡 설정</h2><p class="section-copy">맥락 범위와 곡 전환 방식을 한곳에서 관리합니다.</p></div>
+        </div>
+        <div class="settings-grid">
+          <div class="field">
+            <label for="context-messages">최근 메시지 수</label>
+            <input id="context-messages" type="number" min="3" max="12" step="1" />
+            <span class="muted">3–12개, 기본 6개</span>
+          </div>
+          <div class="field">
+            <label for="crossfade-seconds">크로스페이드 길이</label>
+            <input id="crossfade-seconds" type="number" min="1" max="15" step="1" />
+            <span class="muted">1–15초, 기본 5초</span>
+          </div>
+        </div>
+        <div class="switch-list">
+          <label class="switch-row" for="auto-enabled">
+            <span class="switch-copy">자동 선곡<small>새 AI 응답이 끝나고 재생 중인 곡이 없을 때 실행</small></span>
+            <input id="auto-enabled" type="checkbox" />
+          </label>
+          <label class="switch-row" for="now-playing-enabled">
+            <span class="switch-copy">Now Playing 플로팅<small>현재 재생 상태를 채팅 화면 위에 표시</small></span>
+            <input id="now-playing-enabled" type="checkbox" />
+          </label>
+          <label class="switch-row" for="crossfade-enabled">
+            <span class="switch-copy">자동 크로스페이드<small>곡이 끝나기 전에 다음 곡을 준비해 자연스럽게 전환</small></span>
+            <input id="crossfade-enabled" type="checkbox" />
+          </label>
+        </div>
+        <div class="field">
+          <label for="selection-prompt">보조 모델 선곡 지침</label>
+          <textarea id="selection-prompt"></textarea>
+          <span class="muted">응답 형식과 필수 안전 규칙은 플러그인이 자동으로 덧붙입니다.</span>
+        </div>
+        <div class="section-actions">
+          <button id="reset-prompt" class="subtle">기본 지침 복원</button>
+          <button id="save-settings" class="primary">설정 저장</button>
+        </div>
+        <div id="settings-feedback" class="feedback"></div>
+      </section>
+      <section class="panel-section">
+        <details id="history-details">
+          <summary class="history-summary">
+            <span class="history-summary-copy"><h2>재생 이력</h2><small>최근 100곡을 최신순으로 표시합니다.</small></span>
+            <span class="chevron">⌄</span>
+          </summary>
+          <div id="history-list" class="history-list"></div>
+          <div class="section-actions"><span></span><button id="clear-history" class="danger">재생 이력 초기화</button></div>
+        </details>
+      </section>
+      <section class="panel-section">
+        <div class="section-head">
+          <div><h2>로컬 플레이어 연결</h2><p class="section-copy">BAT이 열어 준 플레이어 창을 BGM 사용 중 계속 유지하세요.</p></div>
+        </div>
+        <div class="url-row">
+          <input id="player-url" type="password" readonly aria-label="로컬 플레이어 주소" />
+          <button id="toggle-player-url" class="subtle">주소 표시</button>
+        </div>
+      </section>
     </main>`;
 
   const elements = Object.fromEntries(
@@ -250,7 +355,7 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
   }
 
   function renderQueue(queue) {
-    elements['queue-count'].textContent = `(${queue.length})`;
+    elements['queue-count'].textContent = String(queue.length);
     elements['queue-list'].replaceChildren();
     for (const [index, track] of queue.entries()) {
       const item = document.createElement('div');
@@ -939,6 +1044,11 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
       setLocalStatus('대기열 비우기 실패', error.message);
     }
   });
+  document.getElementById('toggle-player-url').addEventListener('click', (event) => {
+    const revealing = elements['player-url'].type === 'password';
+    elements['player-url'].type = revealing ? 'text' : 'password';
+    event.currentTarget.textContent = revealing ? '주소 숨기기' : '주소 표시';
+  });
   elements['history-details'].addEventListener('toggle', () => {
     if (elements['history-details'].open) void loadHistory();
   });
@@ -1015,7 +1125,7 @@ const NOW_PLAYING_DEFAULT_OFFSET = { right: 24, top: 24 };
   }
 
   const chatButton = await Risuai.registerButton(
-    { name: 'Contextual BGM v0.4.2', icon: '♫', iconType: 'html', location: 'chat' },
+    { name: 'Contextual BGM v0.4.3', icon: '♫', iconType: 'html', location: 'chat' },
     openPanel,
   );
   const settingButton = await Risuai.registerSetting('Contextual YouTube BGM', openPanel, '♫', 'html');
