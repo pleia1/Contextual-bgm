@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Risu Contextual BGM Player v0.4.1</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, Pretendard, system-ui, sans-serif;
+        background: #0d1117;
+        color: #e6edf3;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+      main { width: min(920px, 100%); background: #161b22; border: 1px solid #30363d; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px #0008; }
+      header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 20px; border-bottom: 1px solid #30363d; }
+      h1 { font-size: 17px; margin: 0; }
+      #status { font-size: 12px; color: #8b949e; background: #0d1117; padding: 6px 10px; border-radius: 999px; }
+      .player-wrap { position: relative; aspect-ratio: 16 / 9; background: #010409; }
+      .player-slot { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+      .player-slot.active { opacity: 1; pointer-events: auto; }
+      .player-slot > div, .player-slot > iframe { width: 100%; height: 100%; }
+      #activation {
+        position: absolute; inset: 0; display: none; place-items: center;
+        background: #010409cc; z-index: 3;
+      }
+      #activation.visible { display: grid; }
+      button, input { font: inherit; }
+      button { border: 1px solid #3d444d; background: #21262d; color: #e6edf3; padding: 9px 14px; border-radius: 9px; cursor: pointer; }
+      button:hover { background: #30363d; }
+      button.primary { background: #238636; border-color: #2ea043; }
+      .info { padding: 18px 20px 8px; }
+      #track { font-size: 16px; font-weight: 650; min-height: 24px; }
+      #artist { margin-top: 4px; color: #8b949e; font-size: 14px; }
+      .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 20px 20px; }
+      .volume { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #8b949e; font-size: 13px; }
+      input[type='range'] { width: 150px; }
+      footer { color: #8b949e; font-size: 12px; padding: 0 20px 18px; }
+      a { color: #58a6ff; }
+      @media (max-width: 560px) { .volume { width: 100%; margin-left: 0; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Risu Contextual YouTube BGM v0.4.1</h1>
+        <span id="status">연결 중</span>
+      </header>
+      <section class="player-wrap">
+        <div id="slot-a" class="player-slot active"><div id="player-a"></div></div>
+        <div id="slot-b" class="player-slot"><div id="player-b"></div></div>
+        <div id="activation"><button id="enable" class="primary">소리 재생 허용</button></div>
+      </section>
+      <section class="info">
+        <div id="track">선택된 곡 없음</div>
+        <div id="artist"></div>
+      </section>
+      <section class="controls">
+        <button id="play">재생</button>
+        <button id="pause">일시정지</button>
+        <button id="stop">정지</button>
+        <button id="skip">다음 후보</button>
+        <a id="youtube-link" href="https://www.youtube.com" target="_blank" rel="noreferrer">YouTube에서 열기</a>
+        <label class="volume">볼륨 <input id="volume" type="range" min="0" max="100" value="35" /></label>
+      </section>
+      <footer id="footer">이 페이지를 열어 둔 상태에서 RisuAI를 사용하세요.</footer>
+    </main>
+    <script src="/player.js"></script>
+  </body>
+</html>

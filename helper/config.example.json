@@ -1,0 +1,21 @@
+{
+  "port": 43127,
+  "authToken": "replace-with-a-long-random-token",
+  "youtubeApiKey": "",
+  "regionCode": "KR",
+  "relevanceLanguage": "ko",
+  "browserAutoplayBypass": false,
+  "browserWindowWidth": 980,
+  "browserWindowHeight": 824,
+  "defaultVolume": 35,
+  "recordAfterSeconds": 10,
+  "policy": {
+    "videoCooldownPlays": 40,
+    "videoCooldownDays": 30,
+    "songCooldownPlays": 30,
+    "songCooldownDays": 30,
+    "artistCooldownPlays": 8,
+    "artistCooldownDays": 7,
+    "maxHistory": 500
+  }
+}

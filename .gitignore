@@ -1,0 +1,4 @@
+helper/config.local.json
+helper/data/
+node_modules/
+npm-debug.log*
